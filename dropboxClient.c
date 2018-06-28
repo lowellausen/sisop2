@@ -660,7 +660,7 @@ void* thread_frontend(){
 	struct packet message;
 	struct sockaddr_in srv_addr;
 	struct hostent *host_srv;
-
+    char ip_str[20];
 	if((frontend_socket = socket(AF_INET, SOCK_DGRAM, 0)) < 0) {
 		exit(1);
 	}
@@ -675,15 +675,16 @@ void* thread_frontend(){
 	while(online){
 		n = recvfrom(frontend_socket, (char *) &message, PACKETSIZE, 0, (struct sockaddr *) &from, (socklen_t *) &from_len);
 		if(n && message.opcode == PING){
-		    char ip_str[20];
-		    inet_ntop(AF_INET,&(from.sin_addr), ip_str, INET_ADDRSTRLEN);
-            printf("Recebeu novo servidor %s!\n\n", ip_str);
+            strncpy(ip_str,message.data,20);
 			host_srv = gethostbyname(ip_str);
             srv_addr.sin_family = AF_INET;
             srv_addr.sin_port = htons(newport);
             srv_addr.sin_addr = *((struct in_addr *)host_srv->h_addr);
             bzero(&(srv_addr.sin_zero), 8);
 			serv_addr = srv_addr;
+
+		    inet_ntop(AF_INET,&(srv_addr.sin_addr), ip_str, INET_ADDRSTRLEN);
+            printf("Recebeu novo servidor %s!\n\n", ip_str);
 		}
 	}
 }
