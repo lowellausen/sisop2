@@ -44,6 +44,7 @@ struct client {
 	short int session_port [MAXSESSIONS];
 	int socket_set[MAXSESSIONS];
 	SOCKET socket[MAXSESSIONS];
+	struct sockaddr_in addr[MAXSESSIONS];
 };
 struct packet {
 	short int opcode;
@@ -397,11 +398,27 @@ void *session_manager(void* args){
 int login(struct packet login_request){
 	struct pair *thread_param;
 	char user_id [MAXNAME];
+    char ip_addr [20];
 	int i, index;
+	char *plus_index;
 	short int port;
 	pthread_t tid;
+	struct hostent *host_cl;
+	struct sockaddr_in cl_addr;
 
-	strncpy (user_id, login_request.data, MAXNAME);
+    if(primary_server_id != local_server_id){
+        plus_index = strchr(login_request.data, '+');
+        strncpy(ip_addr,plus_index+1, 20);
+        plus_index = 0;
+        strncpy(user_id, login_request.data, MAXNAME);
+        printf("IP is %s\n\n",ip_addr);
+        printf("User is %s\n\n",user_id);
+    }
+    else{
+        strncpy (user_id, login_request.data, MAXNAME);
+    }
+
+
 	identify_client(user_id, &index);
 	if (login_request.opcode != LOGIN || index == -1){
 		return -1;
@@ -415,6 +432,16 @@ int login(struct packet login_request){
 			(*thread_param).c_id = index;
 			(*thread_param).s_id = i;
 			create_server_userdir(client_list[index].user_id);
+
+			if(primary_server_id != local_server_id){
+                host_cl = gethostbyname(ip_addr);
+                cl_addr.sin_family = AF_INET;
+                cl_addr.sin_port = htons(9999);
+                cl_addr.sin_addr = *((struct in_addr *)host_cl->h_addr);
+                bzero(&(cl_addr.sin_zero), 8);
+                client_list[index].addr[i] = cl_addr;
+            }
+
 			printf("\nClient Id is %d and  Server Id is %d\n\n", index, i);
 			pthread_create(&tid, NULL, session_manager, (void *) thread_param);
 			return port;
@@ -715,12 +742,16 @@ int main(int argc,char *argv[]){
 
 					inet_ntop(AF_INET, &((struct sockaddr_in *)&client)->sin_addr, ip_str, INET_ADDRSTRLEN);
 
+					fprintf(stderr, "\n%s\n", ip_str);
+
 					char id_ip[MAXNAME + 256];
 
 					strncpy(id_ip, login_request.data, MAXNAME);
 					strcat(id_ip, "+");
 					strcat(id_ip, ip_str);
 					strcat(id_ip, "\0");
+
+					fprintf(stderr, "\n%s\n", id_ip);
 
 					message.opcode = LOGIN;
 					message.seqnum = LOGIN;

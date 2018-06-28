@@ -11,6 +11,7 @@ struct client {
   char userid[MAXNAME];
   struct file_info[MAXFILES];
   int logged_in;
+  struct sockaddr_in addr[MAXSESSIONS];
 }
 
 struct file_info {
