@@ -386,7 +386,9 @@ void *session_manager(void* args){
 						if (reply.opcode == ACK){
 							recebeuack = TRUE;
 						}
+						fprintf(stderr, "\nEsperando close ack\n");
 					}
+					fprintf(stderr, "\n Recebeu close ack\n");
 					servo_id++;
 				}
 			}
