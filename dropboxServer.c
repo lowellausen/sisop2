@@ -615,9 +615,8 @@ void *replica_manager(){
 	ping.seqnum = local_server_id;
 
 	int timeouts = 0;
-
+	pthread_create(&thread_answer, NULL, election_answer, NULL);
 	while(online){
-
 		if (primary_server_id != local_server_id){
 			tv.tv_sec = 2;
 			if (setsockopt(rm_socket, SOL_SOCKET, SO_RCVTIMEO,&tv,sizeof(tv)) < 0) {
@@ -636,7 +635,6 @@ void *replica_manager(){
 				printf("Ping timeout\n\n");
 				not_electing = 0;
 				pthread_create(&thread_elect, NULL, election_ping, NULL);
-				pthread_create(&thread_answer, NULL, election_answer, NULL);
 				pthread_join(thread_elect,(void *) &n);
 			}
 			//printf("Received opcode %hi, pkt #%hi\n\n", reply.opcode, reply.seqnum);
@@ -655,7 +653,6 @@ void *replica_manager(){
 			if(ping.seqnum < local_server_id){
 				not_electing = 0;
 				pthread_create(&thread_elect, NULL, election_ping, NULL);
-				pthread_create(&thread_answer, NULL, election_answer, NULL);
 				pthread_join(thread_elect,(void *) &n);
 			}
 			//printf("Sent opcode %hi, pkt #%hi\n\n", reply.opcode, reply.seqnum);
