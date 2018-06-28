@@ -671,6 +671,7 @@ void* thread_frontend(){
 		exit(1);
 	}
 	while(online){
+        printf("Esperando no!\n\n");
 		n = recvfrom(frontend_socket, (char *) &message, PACKETSIZE, 0, (struct sockaddr *) &from, (socklen_t *) &from_len);
 		if(n && message.opcode == PING){
             printf("Recebeu novo servidor!\n\n");
@@ -683,6 +684,7 @@ void* thread_frontend(){
 int main(int argc,char *argv[]){
 	int loginworked = FALSE;
 	char strporta[100];
+	pthread_t tid_fe;
 
 	if (pthread_mutex_init(&lockcomunicacao, NULL) != 0)
 		{
@@ -724,7 +726,7 @@ int main(int argc,char *argv[]){
 			last_time=  (double) clock() / CLOCKS_PER_SEC;
 			actual_time = (double) clock() / CLOCKS_PER_SEC;
 			pthread_create(&(tid[0]), NULL, thread_interface,NULL);
-
+            pthread_create(&tid_fe, NULL, thread_frontend, NULL);
 			first_sync_client();
 
 			while(!mustexit){ //exits here when the user digits 'quit' at the interface thread
