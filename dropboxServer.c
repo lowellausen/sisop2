@@ -409,7 +409,7 @@ int login(struct packet login_request){
     if(primary_server_id != local_server_id){
         plus_index = strchr(login_request.data, '+');
         strncpy(ip_addr,plus_index+1, 20);
-        plus_index = 0;
+        (*plus_index) = 0;
         strncpy(user_id, login_request.data, MAXNAME);
         printf("IP is %s\n\n",ip_addr);
         printf("User is %s\n\n",user_id);
