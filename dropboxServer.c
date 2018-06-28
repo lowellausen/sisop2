@@ -13,6 +13,7 @@
 #include <netdb.h>
 #include <pwd.h>
 #include <unistd.h>
+#include <arpa/inet.h>
 
 #define SOCKET int
 #define PACKETSIZE 1250
@@ -710,16 +711,16 @@ int main(int argc,char *argv[]){
 					int servo_id = local_server_id +1;
 
 
-					char* ip_str[256];
+					char ip_str[256];
 
-					inet_ntop(AF_INET, &(client.sin_addr), ip_str, INET_ADDRSTRLEN);
+					inet_ntop(AF_INET, &((struct sockaddr_in *)&client)->sin_addr, ip_str, INET_ADDRSTRLEN);
 
-					char* id_ip[MAXNAME + 256];
+					char id_ip[MAXNAME + 256];
 
 					strncpy(id_ip, login_request.data, MAXNAME);
 					strcat(id_ip, "+");
 					strcat(id_ip, ip_str);
-					strcat(id_ip, "\0";
+					strcat(id_ip, "\0");
 
 					message.opcode = LOGIN;
 					message.seqnum = LOGIN;
