@@ -658,6 +658,8 @@ void* thread_frontend(){
 	int n, frontend_len, from_len, online = 1;
 	struct sockaddr_in frontend, from;
 	struct packet message;
+	struct sockaddr_in srv_addr;
+	struct hostent *host_srv;
 
 	if((frontend_socket = socket(AF_INET, SOCK_DGRAM, 0)) < 0) {
 		exit(1);
@@ -676,8 +678,12 @@ void* thread_frontend(){
 		    char ip_str[20];
 		    inet_ntop(AF_INET,&(from.sin_addr), ip_str, INET_ADDRSTRLEN);
             printf("Recebeu novo servidor %s!\n\n", ip_str);
-			serv_addr = from;
-			serv_addr.sin_port = htons(newport);
+			host_srv = gethostbyname(ip_str);
+            srv_addr.sin_family = AF_INET;
+            srv_addr.sin_port = htons(newport);
+            srv_addr.sin_addr = *((struct in_addr *)host_srv->h_addr);
+            bzero(&(srv_addr.sin_zero), 8);
+			serv_addr = srv_addr;
 		}
 	}
 }
