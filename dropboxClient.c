@@ -43,6 +43,7 @@ int mustexit = FALSE;
 char userID[20];
 char host[20];
 int port;
+int newport;
 int socket_local;
 struct sockaddr_in serv_addr;
 struct hostent *server;
@@ -170,7 +171,7 @@ int login_server(char *host,int port){
 			recebeuack = TRUE;
 		}
 	}
-	int newport = reply.seqnum;
+	newport = reply.seqnum;
 
 	if ((socket_local = socket(AF_INET, SOCK_DGRAM, 0)) == -1)
 		printf("ERROR opening socket");
@@ -673,6 +674,7 @@ void* thread_frontend(){
 		n = recvfrom(frontend_socket, (char *) &message, PACKETSIZE, 0, (struct sockaddr *) &from, (socklen_t *) &from_len);
 		if(n && message.opcode == PING){
 			serv_addr = from;
+			serv_addr.sin_port = htons(newport);
 		}
 	}
 }
