@@ -671,10 +671,11 @@ void* thread_frontend(){
 		exit(1);
 	}
 	while(online){
-        printf("Esperando no!\n\n");
 		n = recvfrom(frontend_socket, (char *) &message, PACKETSIZE, 0, (struct sockaddr *) &from, (socklen_t *) &from_len);
 		if(n && message.opcode == PING){
-            printf("Recebeu novo servidor!\n\n");
+		    char ip_str[20];
+		    inet_ntop(AF_INET,&(from.sin_addr), ip_str, INET_ADDRSTRLEN);
+            printf("Recebeu novo servidor %s!\n\n", ip_str);
 			serv_addr = from;
 			serv_addr.sin_port = htons(newport);
 		}
