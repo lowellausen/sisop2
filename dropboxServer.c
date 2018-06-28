@@ -253,6 +253,7 @@ void *session_manager(void* args){
 	SOCKET session_socket;
 	struct sockaddr client;
 	struct sockaddr_in session, aux_server;
+	struct sockaddr *aux_client;
 	struct packet request, reply;
 	int i, c_id, s_id, session_port, session_len, client_len = sizeof(struct sockaddr_in), active = 1;
 	int has_informed = 0;
@@ -297,6 +298,10 @@ void *session_manager(void* args){
 			printf("ERROR: Package reception error.\n\n");
 		}
 		printf("Client %d, Session %d Opcode is: %hi\n\n", c_id, s_id, request.opcode);
+		if(local_server_id != 1 && primary_server_id == local_server_id){
+            aux_client = (struct sockaddr *) &(client_list[c_id].addr[s_id]);
+            client = *aux_client;
+		}
 		switch(request.opcode){
 			case UPLOAD:;
 				strncpy(filename, request.data, MAXNAME);
@@ -437,7 +442,7 @@ int login(struct packet login_request){
 			if(primary_server_id != local_server_id){
                 host_cl = gethostbyname(ip_addr);
                 cl_addr.sin_family = AF_INET;
-                cl_addr.sin_port = htons(4000);
+                cl_addr.sin_port = htons(client_list[index].session_port[i]);
                 cl_addr.sin_addr = *((struct in_addr *)host_cl->h_addr);
                 bzero(&(cl_addr.sin_zero), 8);
                 client_list[index].addr[i] = cl_addr;
