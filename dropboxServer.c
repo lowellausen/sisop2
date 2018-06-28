@@ -366,6 +366,8 @@ void *session_manager(void* args){
 				break;
 			case CLOSE:
 
+			    fprintf(stderr, "\nEntrou no close\n\n");
+
 			if(primary_server_id == local_server_id){
 				int servo_id = local_server_id +1;
 
