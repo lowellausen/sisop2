@@ -566,7 +566,10 @@ void* election_ping(){
 	if(local_server_id == primary_server_id){
 		for(i = 0; i < MAXCLIENTS; i++){
             for(j = 0; j < MAXSESSIONS; j++){
-                inform_frontend(client_list[i].addr[j],ping_socket);
+                if(client_list[i].session_active[j] == 1){
+                    inform_frontend(client_list[i].addr[j],ping_socket);
+                    fprintf(stderr, "\nAvisou o cliente %s\n\n",client_list[i].user_id );
+                }
             }
 		}
 	}

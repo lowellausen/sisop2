@@ -673,6 +673,7 @@ void* thread_frontend(){
 	while(online){
 		n = recvfrom(frontend_socket, (char *) &message, PACKETSIZE, 0, (struct sockaddr *) &from, (socklen_t *) &from_len);
 		if(n && message.opcode == PING){
+            printf("Recebeu novo servidor!\n\n");
 			serv_addr = from;
 			serv_addr.sin_port = htons(newport);
 		}
