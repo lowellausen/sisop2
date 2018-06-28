@@ -192,11 +192,13 @@ int inform_frontend(struct sockaddr_in client, SOCKET session_socket){
 	fe_client.sin_port = htons(4000);
 	fe_len = sizeof(fe_client);
 	ping.opcode = PING;
-	char ip_str[256];
 
-    inet_ntop(AF_INET, &((struct sockaddr_in *)&srv_addr)->sin_addr, ip_str, INET_ADDRSTRLEN);
-    fprintf(stderr, "\n%s\n", ip_str);
-	strcpy(ping.data,ip_str);
+    if(local_server_id == 2){
+        strcpy(ping.data,ip_server_2);
+    }
+    else{
+        strcpy(ping.data,ip_server_3);
+    }
 
 	sendto(session_socket, (char *) &ping, PACKETSIZE, 0, (struct sockaddr *)&fe_client, fe_len);
 	return 0;
