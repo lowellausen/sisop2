@@ -380,15 +380,9 @@ void *session_manager(void* args){
 					struct sockaddr_in servo_logaddr = server_list[servo_id];
 					servo_logaddr.sin_port = htons(session_port);
 
-					while(!recebeuack){
-						sendto(session_socket, (char *)&request, PACKETSIZE, 0, (const struct sockaddr *) &servo_logaddr, sizeof(struct sockaddr_in));
-						recvfrom(session_socket, (char *)&replyServo, PACKETSIZE, 0, (struct sockaddr *) &servo_logaddr, &length);
-						if (reply.opcode == ACK){
-							recebeuack = TRUE;
-						}
-						fprintf(stderr, "\nEsperando close ack\n");
-					}
-					fprintf(stderr, "\n Recebeu close ack\n");
+
+                    sendto(session_socket, (char *)&request, PACKETSIZE, 0, (const struct sockaddr *) &servo_logaddr, sizeof(struct sockaddr_in));
+
 					servo_id++;
 				}
 			}
