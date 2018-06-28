@@ -514,7 +514,9 @@ void close_session(){
 
 	while(!recebeuack){
 		n = sendto(socket_local, (char *)&message, PACKETSIZE, 0, (const struct sockaddr *) &serv_addr, sizeof(struct sockaddr_in));
+		fprintf(stderr,"\nEntrou no exit manda recfrom\n\n");
 		n = recvfrom(socket_local, (char *)&reply, PACKETSIZE, 0, (struct sockaddr *) &from, &length);
+		fprintf(stderr,"\nsaiu do recfrom\n\n");
 		if (reply.opcode == ACK){
 			recebeuack = TRUE;
 		}
