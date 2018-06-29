@@ -315,49 +315,51 @@ void executaSync(struct sync_data syncdata){
 	char* path;
 	int ret=0;
 
-	//printf("\nO que de novo deve ser enviado para o server:\n");
+	printf("\nO que de novo deve ser enviado para o server:\n");
 	i=0;
 	while(strcmp(syncdata.client_new[i],"FIMDALISTA")!=0){
-		if (!encontrou(syncdata.client_new[i],syncdata.client_old)){
+		if (!encontrou(syncdata.client_new[i],syncdata.client_old) && !encontrou(syncdata.client_new[i],syncdata.server_new)){
 			path = devolvePathSyncDirBruto();
 			strcat(path,syncdata.client_new[i]);
+			printf(" - %s\n",path);
 			send_file(path);
-			//printf(" - %s\n",path);
 		}
 		i++;
 	}
-	//printf("\nO que deve ser deletado do server:\n");
+	printf("\nO que deve ser deletado do server:\n");
 	i=0;
 	while(strcmp(syncdata.client_old[i],"FIMDALISTA")!=0){
-		if (!encontrou(syncdata.client_old[i],syncdata.client_new)){
+		if (!encontrou(syncdata.client_old[i],syncdata.client_new) && encontrou(syncdata.client_old[i],syncdata.server_new)){
+			printf(" - %s\n",syncdata.client_old[i]);
 			delete_file(syncdata.client_old[i]);
-			//printf(" - %s\n",syncdata.client_old[i]);
 		}
 		i++;
 	}
-	//printf("\nO que deve ser baixado de novo do server:\n");
+	printf("\nO que deve ser baixado de novo do server:\n");
 	i=0;
 	while(strcmp(syncdata.server_new[i],"FIMDALISTA")!=0){
-		if (!encontrou(syncdata.server_new[i],syncdata.server_old)){
+		if (!encontrou(syncdata.server_new[i],syncdata.server_old) && !encontrou(syncdata.server_new[i],syncdata.client_new)){
+			printf(" - %s\n",syncdata.server_new[i]);
 			get_file(syncdata.server_new[i],devolvePathSyncDirBruto());
-			//printf(" - %s\n",syncdata.server_new[i]);
 		}
 		i++;
 	}
-	//printf("\nO que deve ser deletado no cliente:\n");
+	printf("\nO que deve ser deletado no cliente:\n");
 	i=0;
 	while(strcmp(syncdata.server_old[i],"FIMDALISTA")!=0){
-		if (!encontrou(syncdata.server_old[i],syncdata.server_new)){
+		if (!encontrou(syncdata.server_old[i],syncdata.server_new) && encontrou(syncdata.server_old[i],syncdata.client_new)){
 			path = devolvePathSyncDir();
 			strcat(path,syncdata.server_old[i]);
+			printf(" - %s\n",path);
 			ret = remove(path);
-			//printf(" - %s\n",path);
+
+			if(ret != 0) {
+				printf("Algo deu errado no path da deleção local do arquivo!\n");
+			}
 		}
 		i++;
 	}
 	i=0;
-
-
 }
 
 void firstExecutaSync(struct sync_data syncdata){
